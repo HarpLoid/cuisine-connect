@@ -18,17 +18,17 @@ export default function RecipeCreate(props) {
   const handleFormSubmit = (e) => {
     e.preventDefault();
 
-    const formData = new FormData();
+    const recipeData = {
+      name: title,
+      description: desc,
+      prep_time: cook_time,
+      recipe_ingredients: ingredients,
+      recipe_steps: procedures,
+      recipe_tags: category,
+      header_image: picture,
+    };
 
-    formData.append("category.name", category);
-    formData.append("picture", picture, picture.name);
-    formData.append("title", title);
-    formData.append("desc", desc);
-    formData.append("cook_time", cook_time);
-    formData.append("ingredients", JSON.stringify(ingredients));
-    formData.append("procedure", JSON.stringify(procedures));
-
-    props.handleFormSubmit(formData);
+    props.handleFormSubmit(recipeData);
   };
 
   return (

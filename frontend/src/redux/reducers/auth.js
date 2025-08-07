@@ -18,7 +18,7 @@ export default function (state = initialState, action) {
   switch (action.type) {
     case LOGIN_SUCCESS:
     case REGISTER_SUCCESS:
-      localStorage.setItem("access_token", JSON.stringify(action.payload.access_token));
+      sessionStorage.setItem("access_token", JSON.stringify(action.payload.access_token));
       console.log(action.payload)
       return {
         ...state,
@@ -30,7 +30,7 @@ export default function (state = initialState, action) {
     case LOGIN_FAIL:
     case LOGOUT_SUCCESS:
     case REGISTER_FAIL:
-      localStorage.removeItem("access_token");
+      sessionStorage.removeItem("access_token");
       return {
         ...state,
         token: null,

@@ -3,14 +3,14 @@ from app import app, db
 
 class Ingredient(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    english_name = db.Column(db.String(128), unique=True, nullable=False)
+    name = db.Column(db.String(128), unique=True, nullable=False)
     recipes = db.relationship(
         "RecipeIngredient", backref=db.backref("ingredient", uselist=False), lazy=True
     )
 
     def to_dict(self):
         return {
-            "english_name": self.english_name,
+            "name": self.name,
         }
 
 
@@ -56,12 +56,12 @@ class Recipe(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False, unique=True)
     header_image = db.Column(db.String(128), nullable=True)
-    prep_time = db.Column(db.Integer, nullable=False)
+    prep_time = db.Column(db.Time, nullable=False)
     description = db.Column(db.Text, nullable=False)
-    difficulty = db.Column(db.Integer, nullable=False)
-    vegetarian = db.Column(db.Boolean, nullable=False)
-    quantity = db.Column(db.Float, nullable=False)
-    unit = db.Column(db.String(64), nullable=False)
+    # difficulty = db.Column(db.Integer, nullable=False)
+    # vegetarian = db.Column(db.Boolean, nullable=False)
+    # quantity = db.Column(db.Float, nullable=False)
+    # unit = db.Column(db.String(64), nullable=False)
     contributor_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     steps = db.relationship(
         "RecipeStep",
@@ -97,8 +97,8 @@ class RecipeIngredient(db.Model):
     ingredient_id = db.Column(
         db.Integer, db.ForeignKey("ingredient.id"), nullable=False
     )
-    quantity = db.Column(db.Float, nullable=False)
-    unit = db.Column(db.String(64), nullable=False)
+    # quantity = db.Column(db.Float, nullable=False)
+    # unit = db.Column(db.String(64), nullable=False)
 
 
 class Tag(db.Model):

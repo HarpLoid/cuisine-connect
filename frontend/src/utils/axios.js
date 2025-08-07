@@ -30,21 +30,21 @@ axiosInstance.interceptors.response.use(
       !originalRequest._retry
     ) {
       originalRequest._retry = true;
-      const refreshToken = JSON.parse(localStorage.getItem("access_token")).refresh;
+      const refreshToken = JSON.parse(sessionStorage.getItem("access_token")).refresh;
 
       return axiosInstance
         .post("/user/token/refresh/", {
           refresh: refreshToken,
         })
         .then((response) => {
-          localStorage.setItem("access_token", JSON.stringify(response.data));
+          sessionStorage.setItem("access_token", JSON.stringify(response.data));
 
           axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${
-            JSON.parse(localStorage.getItem("access_token")).access
+            JSON.parse(sessionStorage.getItem("access_token")).access
           }`;
 
           originalRequest.headers["Authorization"] = `Bearer ${
-            JSON.parse(localStorage.getItem("access_token")).access
+            JSON.parse(sessionStorage.getItem("access_token")).access
           }`;
 
           return axiosInstance(originalRequest);
@@ -72,9 +72,9 @@ const axiosInstance = axios.create({
     if (response.data && response.data.access_token) {
       const newToken = response.data.access_token;
       // Update local storage with the new token
-      const storedData = JSON.parse(localStorage.getItem("access_token")) || {};
+      const storedData = JSON.parse(sessionStorage.getItem("access_token")) || {};
       storedData.access = newToken;
-      localStorage.setItem("access_token", JSON.stringify(storedData));
+      sessionStorage.setItem("access_token", JSON.stringify(storedData));
 
       // Update axios instance headers with the new token
       axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
@@ -113,21 +113,21 @@ axiosInstance.interceptors.response.use(
       !originalRequest._retry
     ) {
       originalRequest._retry = true;
-      const refreshToken = JSON.parse(localStorage.getItem("access_token")).refresh;
+      const refreshToken = JSON.parse(sessionStorage.getItem("access_token")).refresh;
 
       return axiosInstance
         .post("/user/token/refresh/", {
           refresh: refreshToken,
         })
         .then((response) => {
-          localStorage.setItem("access_token", JSON.stringify(response.data));
+          sessionStorage.setItem("access_token", JSON.stringify(response.data));
 
           axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${
-            JSON.parse(localStorage.getItem("access_token")).access
+            JSON.parse(sessionStorage.getItem("access_token")).access
           }`;
 
           originalRequest.headers["Authorization"] = `Bearer ${
-            JSON.parse(localStorage.getItem("access_token")).access
+            JSON.parse(sessionStorage.getItem("access_token")).access
           }`;
 
           return axiosInstance(originalRequest);

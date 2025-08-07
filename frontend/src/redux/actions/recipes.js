@@ -56,12 +56,13 @@ export const getDetailRecipe = (id) => (dispatch, getState) => {
     });
 };
 
-export const createRecipe = (formData) => (dispatch, getState) => {
+export const createRecipe = (recipeData) => (dispatch, getState) => {
   dispatch({ type: RECIPE_LOADING });
 
+  const body = JSON.stringify(recipeData);
+
   axiosInstance
-    .post("/recipes/create", formData, tokenConfig(getState))
-    console.log(formData)
+    .post("/recipes/create", body, tokenConfig(getState))
     .then((res) => {
       dispatch({
         type: CREATE_RECIPE,

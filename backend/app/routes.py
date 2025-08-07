@@ -72,7 +72,6 @@ def user_login():
 @jwt_required()
 def user_profile():
     username = get_jwt_identity()
-    print(username)
     return jsonify(User.query.filter(User.username == username).first().to_dict())
 
 
@@ -257,8 +256,6 @@ def recipes():
     newRecipeFull = request.get_json(force=True)
     username = get_jwt_identity()
     user = User.query.filter(User.username == username).first()
-    print(newRecipeFull)
-    print(username)
     if user is None:
         return Response(status=400)
     else:

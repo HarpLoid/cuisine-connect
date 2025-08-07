@@ -114,7 +114,6 @@ export const logout =
 
 export const tokenConfig = (getState) => {
   const token = getState().auth.token;
-
   const config = {
     headers: {
       "Content-Type": "application/json",

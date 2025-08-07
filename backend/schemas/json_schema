@@ -5,9 +5,9 @@
             "type": "object",
             "properties": {
                 "id": { "type": "integer" },
-                "english_name": { "type": "string" }
+                "name": { "type": "string" }
             },
-            "required": ["id", "english_name"]
+            "required": ["id", "name"]
         },
         "User": {
             "type": "object",
@@ -28,34 +28,27 @@
                 "header_image": { "type": "string", "contentEncoding": "base64" },
                 "prep_time": { "type": "integer" },
                 "description": { "type": "string" },
-                "difficulty": { "type": "integer" },
-                "vegetarian": { "type": "boolean" },
-                "quantity": { "type": "number" },
-                "unit": { "type": "string" },
                 "contributor_id": { "type": "integer" }
             },
-            "required": ["id", "name", "header_image", "prep_time", "description", "difficulty", "vegetarian", "quantity", "unit", "contributor_id"]
+            "required": ["id", "name", "header_image", "prep_time", "description", "contributor_id"]
         },
         "Recipe_Step": {
             "type": "object",
             "properties": {
                 "id": { "type": "integer" },
                 "recipe_id": { "type": "integer" },
-                "serial_number": { "type": "integer" },
                 "instruction": { "type": "string" }
             },
-            "required": ["id", "recipe_id", "serial_number", "instruction"]
+            "required": ["id", "recipe_id", "instruction"]
         },
         "Recipe_Ingredient": {
             "type": "object",
             "properties": {
                 "id": { "type": "integer" },
                 "recipe_id": { "type": "integer" },
-                "ingredient_id": { "type": "integer" },
-                "quantity": { "type": "number" },
-                "unit": { "type": "string" }
+                "ingredient_id": { "type": "integer" }
             },
-            "required": ["id", "recipe_id", "ingredient_id", "quantity", "unit"]
+            "required": ["id", "recipe_id", "ingredient_id"]
         },
         "Tag": {
             "type": "object",

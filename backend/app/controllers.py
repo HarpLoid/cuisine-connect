@@ -1,3 +1,4 @@
+from datetime import datetime
 from app import db, bcrypt
 from app.models import (
     User, Recipe,
@@ -7,18 +8,25 @@ from app.models import (
     )
 
 
+def validate_header_image(header_image):
+    # Accept only None or a string (URL/path), otherwise return None
+    if header_image is None or isinstance(header_image, str):
+        return header_image
+    return None
+
 def add_full_recipe(new_recipe_full: dict, contributor_id: int, recipe_id=None):
+    new_recipe_full["header_image"] = validate_header_image(new_recipe_full.get("header_image"))
     if recipe_id is None:
         new_recipe = Recipe(
             name=new_recipe_full["name"],
             header_image=new_recipe_full["header_image"],
-            prep_time=new_recipe_full["prep_time"],
+            prep_time=datetime.strptime(new_recipe_full["prep_time"], "%H:%M:%S").time(),
             description=new_recipe_full["description"],
-            difficulty=new_recipe_full["difficulty"],
+            # difficulty=new_recipe_full["difficulty"],
             contributor_id=contributor_id,
-            vegetarian=new_recipe_full["vegetarian"],
-            quantity=new_recipe_full["quantity"],
-            unit=new_recipe_full["unit"]
+            # vegetarian=new_recipe_full["vegetarian"],
+            # quantity=new_recipe_full["quantity"],
+            # unit=new_recipe_full["unit"]
         )
         db.session.add(new_recipe)
         db.session.commit()
@@ -27,32 +35,34 @@ def add_full_recipe(new_recipe_full: dict, contributor_id: int, recipe_id=None):
         new_recipe = Recipe(
             id=recipe_id,
             name=new_recipe_full["name"],
-            prep_time=new_recipe_full["prep_time"],
+            prep_time=datetime.strptime(new_recipe_full["prep_time"], "%H:%M:%S").time(),
             description=new_recipe_full["description"],
-            difficulty=new_recipe_full["difficulty"],
+            # difficulty=new_recipe_full["difficulty"],
             contributor_id=contributor_id,
-            vegetarian=new_recipe_full["vegetarian"],
-            quantity=new_recipe_full["quantity"],
-            unit=new_recipe_full["unit"]
+            # vegetarian=new_recipe_full["vegetarian"],
+            # quantity=new_recipe_full["quantity"],
+            # unit=new_recipe_full["unit"]
         )
         db.session.add(new_recipe)
         db.session.commit()
 
     # Add recipe steps
+    counter = 0
     for step in new_recipe_full["recipe_steps"]:
         recipe_step = RecipeStep(
             recipe_id=recipe_id,
-            serial_number=step["serial_number"],
-            instruction=step["instruction"]
+            serial_number= counter,
+            instruction=step
         )
         db.session.add(recipe_step)
+        counter += 1
     db.session.commit()
 
     # Add recipe tags
     for tag in new_recipe_full["recipe_tags"]:
-        new_tag = Tag.query.filter_by(name=tag["name"]).first()
+        new_tag = Tag.query.filter_by(name=tag).first()
         if new_tag is None:
-            new_tag = Tag(name=tag["name"])
+            new_tag = Tag(name=tag)
             db.session.add(new_tag)
             db.session.commit()
         db.session.execute(Recipe_Tag.insert().values(tag_id=new_tag.id, recipe_id=recipe_id))
@@ -60,17 +70,19 @@ def add_full_recipe(new_recipe_full: dict, contributor_id: int, recipe_id=None):
 
     # Add recipe ingredients
     for ingredient in new_recipe_full["recipe_ingredients"]:
-        new_ingredient = Ingredient.query.filter_by(english_name=ingredient["english_name"]).first()
+        new_ingredient = Ingredient.query.filter_by(name=ingredient).first()
+        # If the ingredient does not exist, create it
+        # and add it to the database
         if new_ingredient is None:
-            new_ingredient = Ingredient(english_name=ingredient["english_name"])
+            new_ingredient = Ingredient(name=ingredient)
             db.session.add(new_ingredient)
             db.session.commit()
         
         recipe_ingredient = RecipeIngredient(
             recipe_id=recipe_id,
             ingredient_id=new_ingredient.id,
-            quantity=ingredient["quantity"],
-            unit=ingredient["unit"]
+            #quantity=ingredient["quantity"],
+            #unit=ingredient["unit"]
         )
         db.session.add(recipe_ingredient)
     db.session.commit()
@@ -135,12 +147,12 @@ def get_recipe_meta(recipe_by_id: Recipe):
     return {
         "id": recipe_by_id.id,
         "name": recipe_by_id.name,
-        "prep_time": recipe_by_id.prep_time,
+        "prep_time": recipe_by_id.prep_time.strftime("%H:%M:%S"),
         "description": recipe_by_id.description,
-        "difficulty": recipe_by_id.difficulty,
-        "vegetarian": recipe_by_id.vegetarian,
-        "quantity": recipe_by_id.quantity,
-        "unit": recipe_by_id.unit,
+        # "difficulty": recipe_by_id.difficulty,
+        # "vegetarian": recipe_by_id.vegetarian,
+        # "quantity": recipe_by_id.quantity,
+        # "unit": recipe_by_id.unit,
         "contributor_username": recipe_by_id.contributor.username,
         "next_id": get_next_of(recipe_by_id.id),
         "prev_id": get_prev_of(recipe_by_id.id),
@@ -150,9 +162,9 @@ def get_recipe_meta(recipe_by_id: Recipe):
 def get_recipe_ingredients(recipe: Recipe):
     return [
         {
-            "english_name": recipe_ingredient.ingredient.english_name,
-            "quantity": recipe_ingredient.quantity,
-            "unit": recipe_ingredient.unit,
+            "name": recipe_ingredient.ingredient.name,
+            # "quantity": recipe_ingredient.quantity,
+            # "unit": recipe_ingredient.unit,
         }
         for recipe_ingredient in recipe.ingredients
     ]
@@ -175,12 +187,12 @@ def get_recipe_full(recipe: Recipe):
     return {
         "id": recipe.id,
         "name": recipe.name,
-        "prep_time": recipe.prep_time,
+        "prep_time": recipe.prep_time.strftime("%H:%M:%S"),
         "description": recipe.description,
-        "difficulty": recipe.difficulty,
-        "vegetarian": recipe.vegetarian,
-        "quantity": recipe.quantity,
-        "unit": recipe.unit,
+        # "difficulty": recipe.difficulty,
+        # "vegetarian": recipe.vegetarian,
+        # "quantity": recipe.quantity,
+        # "unit": recipe.unit,
         "contributor_name": recipe.contributor.name,
         "contributor_username": recipe.contributor.username,
         "contributor_bio": recipe.contributor.bio,
