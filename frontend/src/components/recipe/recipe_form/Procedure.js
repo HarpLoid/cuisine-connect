@@ -14,17 +14,17 @@ export default function Procedure({ editMode, recipe }) {
 
   useEffect(() => {
     if (recipe && editMode === true) {
-      const defaultProcedures = JSON.parse(recipe[0].procedure);
+      const defaultProcedures = recipe.recipe_steps;
 
       defaultProcedures.map((defaultProcedure) =>
         setProcedures((e) => [...e, defaultProcedure])
       );
     }
-  }, []);
+  }, [editMode, recipe]);
 
   useEffect(() => {
     dispatch(addProcedures(procedures));
-  }, [procedures]);
+  }, [procedures, dispatch]);
 
   const handleClick = () => {
     const value = textInput.current.value;

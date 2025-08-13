@@ -76,7 +76,7 @@ export default function QuickView({ open, setOpen, id }) {
                     <div className="sm:col-span-4 lg:col-span-5">
                       <div className="aspect-w-1 aspect-h-1 rounded-lg bg-gray-100 overflow-hidden">
                         <img
-                          src={recipe[0].picture}
+                          src={recipe[0].header_image}
                           alt=""
                           className="w-full h-full"
                         />
@@ -84,7 +84,7 @@ export default function QuickView({ open, setOpen, id }) {
                     </div>
                     <div className="sm:col-span-8 lg:col-span-7">
                       <h2 className="text-2xl font-extrabold text-gray-900 sm:pr-12">
-                        {recipe[0].title}
+                        {recipe[0].name}
                       </h2>
 
                       <section

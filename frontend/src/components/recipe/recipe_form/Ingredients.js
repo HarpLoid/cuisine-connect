@@ -1,39 +1,39 @@
-import { useState, createRef, useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { PlusIcon } from "@heroicons/react/solid";
+import { useState, createRef, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { PlusIcon } from '@heroicons/react/solid';
 
-import { addIngredients } from "../../../redux/actions/forms";
+import { addIngredients } from '../../../redux/actions/forms';
 
 export default function Ingredients({ editMode, recipe }) {
   let textInput = createRef();
 
   const [ingredients, setIngredients] = useState([]);
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState({name: '', quantity: '', unit: ''});
 
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (recipe && editMode === true) {
-      const defaultIngredients = JSON.parse(recipe[0].ingredients);
+      const defaultIngredients = recipe.recipe_ingredients;
 
       defaultIngredients.map((defaultIngredient) =>
         setIngredients((e) => [...e, defaultIngredient])
       );
     }
-  }, []);
+  }, [editMode, recipe]);
 
   useEffect(() => {
     dispatch(addIngredients(ingredients));
   }, [ingredients, dispatch]);
 
   const handleClick = () => {
-    const value = textInput.current.value;
-    if (!ingredients.includes(value)) {
-      setIngredients((e) => [...e, value]);
+    const {name, quantity, unit} = inputValue;
+    if (!ingredients.some(ing => ing.name === name && ing.unit === unit)) {
+      setIngredients((e) => [...e, { name, quantity, unit }]);
     } else {
-      alert("Item already exists");
+      alert('Item already exists');
     }
-    setInputValue("");
+    setInputValue({ name: '', quantity: '', unit: '' });
   };
 
   const handleXClick = (ingredient) => {
@@ -69,12 +69,13 @@ export default function Ingredients({ editMode, recipe }) {
 
                 <div className="mt-2 sm:mt-0 sm:ml-4">
                   <div className="-m-1 flex flex-wrap items-center">
-                    {ingredients.map((ingredient) => (
+                    {ingredients.map((ingredient, idx) => (
                       <span
-                        key={ingredient}
+                        key={ingredient.name + ingredient.unit + idx}
                         className="m-1 inline-flex rounded-full border border-gray-200 items-center py-1.5 pl-3 pr-2 text-sm font-medium bg-white text-gray-900"
                       >
-                        <span>{ingredient}</span>
+                        
+                        <span>{ingredient.quantity} {ingredient.unit} of {ingredient.name}</span>
                         <button
                           type="button"
                           className="flex-shrink-0 ml-1 h-4 w-4 p-1 rounded-full inline-flex text-gray-400 hover:bg-gray-200 hover:text-gray-500"
@@ -118,14 +119,40 @@ export default function Ingredients({ editMode, recipe }) {
                   <div className="flex-grow">
                     <input
                       type="text"
-                      name="add-ingredients"
-                      id="add-ingredients"
+                      name="ingredient-quantity"
+                      id="ingredient-quantity"
                       className="block shadow-sm p-2 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm text-lg border border-gray-300 rounded-md"
-                      placeholder="Enter an ingredient"
-                      aria-describedby="add-ingredients"
+                      placeholder="Quantity (e.g., 2)"
+                      aria-describedby="ingredient-quantity"
                       ref={textInput}
-                      value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
+                      value={inputValue.quantity}
+                      onChange={(e) => setInputValue({ ...inputValue, quantity: e.target.value })}
+                    />
+                  </div>
+                  <div className="flex-grow">
+                    <input
+                      type="text"
+                      name="ingredient-unit"
+                      id="ingredient-unit"
+                      className="block shadow-sm p-2 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm text-lg border border-gray-300 rounded-md"
+                      placeholder="Unit (e.g., g, ml, cup)"
+                      aria-describedby="ingredient-unit"
+                      ref={textInput}
+                      value={inputValue.unit}
+                      onChange={(e) => setInputValue({ ...inputValue, unit: e.target.value })}
+                    />
+                  </div>
+                  <div className="flex-grow">
+                    <input
+                      type="text"
+                      name="ingredient-name"
+                      id="ingredient-name"
+                      className="block shadow-sm p-2 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm text-lg border border-gray-300 rounded-md"
+                      placeholder="Name of ingredient"
+                      aria-describedby="ingredient-name"
+                      ref={textInput}
+                      value={inputValue.name}
+                      onChange={(e) => setInputValue({ ...inputValue, name: e.target.value })}
                     />
                   </div>
                   <span className="ml-3">

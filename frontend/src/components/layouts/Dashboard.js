@@ -1,5 +1,5 @@
-import { Fragment, useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { Fragment, useState } from "react";
+import { useSelector } from "react-redux";
 import { Link, Outlet } from "react-router-dom";
 import { Dialog, Transition } from "@headlessui/react";
 import {
@@ -236,7 +236,6 @@ export default function Dashboard() {
             </div>
           </div>
           <main className="flex-1 pb-8">
-            {/* Page header */}
             <Outlet />
           </main>
         </div>

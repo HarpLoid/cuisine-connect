@@ -9,7 +9,7 @@ export default function TimePicker({ editMode, recipe }) {
   let defaultCookTime;
 
   if (editMode) {
-    defaultCookTime = recipe[0].cook_time.split(":");
+    defaultCookTime = recipe.prep_time.split(":");
   }
 
   const [hours, setHours] = useState(editMode ? defaultCookTime[0] : "0");
@@ -19,7 +19,7 @@ export default function TimePicker({ editMode, recipe }) {
   useEffect(() => {
     const cook_time = `${hours}:${minutes}:${seconds}`;
     dispatch(addCooktime(cook_time));
-  }, [hours, minutes, seconds]);
+  }, [hours, minutes, seconds, dispatch]);
 
   return (
     <div>

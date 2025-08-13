@@ -18,14 +18,14 @@ from app.controllers import (
     edit_recipe,
     add_new_user,
     get_recipe_by_id,
-    get_recipe_tags,
+    get_recipe_category,
     get_recipe_meta,
     get_recipe_ingredients,
     get_recipe_steps,
     get_recipe_full,
     get_comments_tree_for_recipe
 )
-from app.models import User, Recipe, Ingredient, Tag, Collection, Collection_Recipe, Comment
+from app.models import User, Recipe, Ingredient, Category, Collection, Comment
 
 
 @app.route("/api/users", methods=["GET"])
@@ -194,7 +194,7 @@ def user_collections():
                 .first()
             )
             if collection is not None:
-                db.session.query(Collection_Recipe).filter_by(
+                db.session.query(Collection).filter_by(
                     collection_id=collection.id
                 ).delete()
                 db.session.delete(collection)
@@ -210,27 +210,32 @@ def user_collection(id):
     username = get_jwt_identity()
     user = User.query.filter(User.username == username).first()
     collection = (
-        Collection.query.filter(Collection.user_id == user.id)
-        .filter(Collection.id == id)
-        .first()
+        db.session.query(Collection, Recipe).join(Recipe, Collection.recipe_id == Recipe.id)
+        .all()
     )
-    if user is None or collection is None:
+    if user is None: #or collection is None:
         abort(404)
     if request.method == "GET":
         return jsonify(
-            {"recipes": [get_recipe_meta(recipe) for recipe in collection.recipes]}
+            {"recipes": [get_recipe_meta(recipe[1]) for recipe in collection]}
         )
     if request.method == "POST":
         if request.json:
-            recipe_id = request.json.get("recipe_id", None)
+            recipe_id = request.json.get("id", None)
         recipe = Recipe.query.get(recipe_id)
+        new_collection = Collection(user_id=user.id)
         if recipe is None:
             abort(404)
         else:
-            if recipe.id in [r.id for r in collection.recipes]:
+            for r in collection:
+                print("before append", r[1].id)
+            if recipe.id in [r[1].id for r in collection]:
                 return jsonify(msg='Recipe already in collection'), 200
             else:
-                collection.recipes.append(recipe)
+                new_collection.recipe_id = recipe.id
+                for r in collection:
+                    print("after append", r)
+                db.session.add(new_collection)
                 db.session.commit()
                 return jsonify(msg='Recipe added to collection'), 201
     if request.method == "DELETE":
@@ -243,7 +248,7 @@ def user_collection(id):
             if recipe.id not in [r.id for r in collection.recipes]:
                 return jsonify(msg='Recipe is not in collection'), 404
             else:
-                db.session.query(Collection_Recipe).filter_by(
+                db.session.query(Collection).filter_by(
                     collection_id=collection.id
                 ).filter_by(recipe_id=recipe_id).delete()
                 db.session.commit()
@@ -253,7 +258,19 @@ def user_collection(id):
 @app.route("/api/recipes/create", methods=["POST"])
 @jwt_required()
 def recipes():
-    newRecipeFull = request.get_json(force=True)
+    if request.content_type.startswith('multipart/form-data'):
+        newRecipeFull = {
+            "name": request.form.get("name"),
+            "description": request.form.get("description"),
+            "prep_time": request.form.get("prep_time"),
+            "recipe_category": request.form.get("recipe_category").strip('"'),
+            "recipe_ingredients": json.loads(request.form.get("recipe_ingredients", "[]")),
+            "recipe_steps": json.loads(request.form.get("recipe_steps", "[]")),
+            "header_image": request.files.get("header_image"),
+        }
+    else:
+        return Response(status=400)
+
     username = get_jwt_identity()
     user = User.query.filter(User.username == username).first()
     if user is None:
@@ -271,67 +288,81 @@ def recipes_n(num):
     else:
         return jsonify(get_recipe_meta(r))
 
-
-@app.route("/api/recipes/<int:num>", methods=["PATCH", "DELETE"])
+@app.route("/api/recipes/<int:num>/edit", methods=["PATCH"])
 @jwt_required()
-def recipes_n_path_delete(num):
-    r = get_recipe_by_id(num)
-    print(r)
+def recipes_n_path_edit(num):
+    recipe = get_recipe_by_id(num)
     username = get_jwt_identity()
-    print(username)
     user = User.query.filter(User.username == username).first()
-    if r is None or user is None or user.username != r.contributor.username:
+    if recipe is None or user is None or user.username != recipe.contributor.username:
         abort(404)
     else:
-        if request.method == "PATCH":
-            newRecipeFull = request.get_json(force=True)
-            edit_recipe(newRecipeFull, r, user)
-            return Response(status=200)
-        if request.method == "DELETE":
-            db.session.delete(r)
-            db.session.commit()
-            return Response(status=200)
+        if request.content_type.startswith('multipart/form-data'):
+            newRecipeFull = {
+                "name": request.form.get("name"),
+                "description": request.form.get("description"),
+                "prep_time": request.form.get("prep_time"),
+                "recipe_category": request.form.get("recipe_category").strip('"'),
+                "recipe_ingredients": json.loads(request.form.get("recipe_ingredients", "[]")),
+                "recipe_steps": json.loads(request.form.get("recipe_steps", "[]")),
+                "header_image": request.files.get("header_image"),
+            }
+        edit_recipe(newRecipeFull, recipe, user)
+        return Response(status=200)
+
+@app.route("/api/recipes/<int:num>/delete", methods=["DELETE"])
+@jwt_required()
+def recipes_n_path_delete(num):
+    recipe = get_recipe_by_id(num)
+    username = get_jwt_identity()
+    user = User.query.filter(User.username == username).first()
+    if recipe is None or user is None or user.username != recipe.contributor.username:
+        abort(404)
+    else:
+        db.session.delete(recipe)
+        db.session.commit()
+        return Response(status=200)
 
 
-@app.route("/api/recipes/<int:num>/tags")
-def recipes_n_tags(num):
+@app.route("/api/recipes/<int:num>/category")
+def recipes_n_category(num):
     r = get_recipe_by_id(num)
     if r is None:
         abort(404)
     else:
-        return jsonify({"tags": get_recipe_tags(r)})
+        return jsonify({"category": get_recipe_category(r)})
 
 
 @app.route("/api/recipes/<int:num>/ingredients")
 def recipes_n_ingredients(num):
-    r = get_recipe_by_id(num)
-    if r is None:
+    recipe = get_recipe_by_id(num)
+    if recipe is None:
         abort(404)
     else:
-        return jsonify({"name": r.name, "recipe_ingredients": get_recipe_ingredients(r)})
+        return jsonify({"name": recipe.name, "recipe_ingredients": get_recipe_ingredients(recipe)})
 
 
 @app.route("/api/recipes/<int:num>/steps")
 def recipes_n_steps(num):
-    r = get_recipe_by_id(num)
-    if r is None:
+    recipe = get_recipe_by_id(num)
+    if recipe is None:
         abort(404)
     else:
-        return jsonify({"name": r.name, "recipe_steps": get_recipe_steps(r)})
+        return jsonify({"name": recipe.name, "recipe_steps": get_recipe_steps(recipe)})
 
 
 @app.route("/api/recipes/<int:num>/full", methods=['GET'])
 def recipes_n_full(num):
-    r = get_recipe_by_id(num)
-    if r is None:
+    recipe = get_recipe_by_id(num)
+    if recipe is None:
         abort(404)
     else:
-        return jsonify(get_recipe_full(r)), 200
+        return jsonify(get_recipe_full(recipe)), 200
 
 
 @app.route("/api/recipes/count")
 def recipes_count():
-    return jsonify({"count": len(Recipe.query.all())})
+    return jsonify({"count": Recipe.query.count()})
 
 
 @app.route("/api/recipes/all")
@@ -341,13 +372,13 @@ def recipes_all():
     )
 
 
-@app.route("/api/recipes/bytag/<tag>")
-def recipes_bytag(tag):
+@app.route("/api/recipes/byCategory/<Category>")
+def recipes_byCategory(Category):
     return jsonify(
         {
             "recipes": [
                 get_recipe_meta(r)
-                for r in Tag.query.filter(Tag.name == tag).first().recipes
+                for r in Category.query.filter(Category.name == Category).first().recipes
             ]
         }
     )
@@ -358,9 +389,9 @@ def ingredients_all():
     return jsonify({"ingredients": [i.to_dict() for i in Ingredient.query.all()]})
 
 
-@app.route("/api/tags/all")
-def tags_all():
-    return jsonify({"tags": [t.name for t in Tag.query.all()]})
+@app.route("/api/category/all")
+def category_all():
+    return jsonify({"category": [t.name for t in Category.query.all()]})
 
 
 @app.route("/api/recipes/<int:recipe_id>/comments/add", methods=["POST"])

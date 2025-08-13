@@ -1,4 +1,4 @@
-import { Fragment, useRef, useEffect } from "react";
+import { Fragment, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { Dialog, Transition } from "@headlessui/react";
 import { ExclamationIcon } from "@heroicons/react/outline";

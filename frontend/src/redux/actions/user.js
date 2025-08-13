@@ -79,11 +79,11 @@ export const getSavedRecipes = (user_id) => (dispatch, getState) => {
   dispatch({ type: RECIPE_LOADING });
 
   axiosInstance
-    .get(`/user/profile/${user_id}/bookmarks/`, tokenConfig(getState))
+    .get(`/collections/${user_id}`, tokenConfig(getState))
     .then((res) => {
       dispatch({
         type: GET_SAVED_RECIPES,
-        payload: res.data,
+        payload: res.data.recipes,
       });
     })
     .catch((err) => {

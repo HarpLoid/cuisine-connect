@@ -34,15 +34,25 @@ function classNames(...classes) {
 
 export default function Category({ editMode, recipe }) {
   const [selectedcategories, setSelectedcategories] = useState(
-    editMode ? recipe[0].category.name : categories[0].title
+    editMode && recipe.category ? recipe.category : categories[0].title
   );
 
   const dispatch = useDispatch();
 
+  // useEffect(() => {
+  //   if (editMode && recipe.category) {
+  //     let cat = recipe.category.replace(/"/g, '');
+  //     let category = categories.find(category => category.title === cat);
+  //     if (category){
+  //       setSelectedcategories(category.title);
+  //     }
+  //   }
+  // }, [editMode, recipe.category]);
+
   useEffect(() => {
     dispatch(addCategory(selectedcategories));
-  }, [selectedcategories]);
-
+  }, [selectedcategories, dispatch]);
+  
   return (
     <RadioGroup value={selectedcategories} onChange={setSelectedcategories}>
       <RadioGroup.Label className="text-lg leading-6 font-medium text-gray-900">

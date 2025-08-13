@@ -14,22 +14,26 @@ export default function RecipeCreate(props) {
   const { category, ingredients, procedures, cook_time, picture } = useSelector(
     (state) => state.forms
   );
-
+   console.log("Category:", category);
   const handleFormSubmit = (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const recipeData = {
-      name: title,
-      description: desc,
-      prep_time: cook_time,
-      recipe_ingredients: ingredients,
-      recipe_steps: procedures,
-      recipe_tags: category,
-      header_image: picture,
-    };
+  const formData = new FormData();
+  formData.append("name", title);
+  formData.append("description", desc);
+  formData.append("prep_time", cook_time);
 
-    props.handleFormSubmit(recipeData);
-  };
+  // These are arrays/objects, so stringify them
+  formData.append("recipe_ingredients", JSON.stringify(ingredients));
+  formData.append("recipe_steps", JSON.stringify(procedures));
+  formData.append("recipe_category", JSON.stringify(category));
+
+  if (picture) {
+    formData.append("header_image", picture);
+  }
+
+  props.handleFormSubmit(formData); // Pass FormData to parent or make API call here
+};
 
   return (
     <>
@@ -62,7 +66,7 @@ export default function RecipeCreate(props) {
                       className="shadow-sm p-2 focus:outline-none focus:ring-teal-500 focus:border-teal-500 mt-1 block w-full border border-gray-300 rounded-md"
                       placeholder="Write a title for your recipe. Something catchy ..."
                       defaultValue={
-                        props.editMode ? props.recipe[0].title : null
+                        props.editMode ? props.recipe.name : null
                       }
                       onChange={(e) => setTitle(e.target.value)}
                     />
@@ -79,7 +83,7 @@ export default function RecipeCreate(props) {
                         className="shadow-sm p-2 focus:outline-none focus:ring-teal-500 focus:border-teal-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md"
                         placeholder="Write a short description..."
                         defaultValue={
-                          props.editMode ? props.recipe[0].desc : null
+                          props.editMode ? props.recipe.desc : null
                         }
                         onChange={(e) => setDesc(e.target.value)}
                       />

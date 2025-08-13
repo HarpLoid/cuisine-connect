@@ -51,7 +51,7 @@ export default function RecipeDetail() {
   let procedures = detailRecipe.recipe_steps;
   const ingredients = []
   detailRecipe.recipe_ingredients.forEach((ingredient) => {
-    ingredients.push(`${ingredient.english_name} ${ingredient.quantity} ${ingredient.unit}`)
+    ingredients.push(`${ingredient.quantity} ${ingredient.unit} ${ingredient.name}`)
   });
 
   const recipe = {
@@ -92,7 +92,7 @@ export default function RecipeDetail() {
                     {detailRecipe.name}
                   </h1>
 
-                  <Link to={`/recipes/${id}/edit`}>
+                  <Link to={`/recipe/${id}/edit`}>
                     <button
                       type="button"
                       className="group ml-4 py-3 px-3 rounded-md flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-gray-500"
@@ -132,7 +132,7 @@ export default function RecipeDetail() {
                   <h3 className="sr-only">Description</h3>
                   <div
                     className="text-base text-gray-700 space-y-6"
-                    dangerouslySetInnerHTML={{ __html: detailRecipe.descriptionn }}
+                    dangerouslySetInnerHTML={{ __html: detailRecipe.description }}
                   />
                 </div>
 

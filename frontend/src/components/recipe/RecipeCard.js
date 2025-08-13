@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { HeartIcon, BookmarkIcon } from "@heroicons/react/outline";
 import { likeRecipe, saveRecipe } from "../../redux/actions/recipes";
@@ -27,7 +27,7 @@ export default function RecipeCard({ recipes, quickview }) {
                     <dt>
                       <div>
                         <img
-                          src={recipe.picture}
+                          src={recipe.header_image}
                           className="object-cover w-full h-48"
                           alt=""
                         />
@@ -87,7 +87,7 @@ export default function RecipeCard({ recipes, quickview }) {
                     className="h-6 w-6 text-gray-400"
                     aria-hidden="true"
                     onClick={() => {
-                      dispatch(saveRecipe(recipe.author, id));
+                      dispatch(saveRecipe(recipe.contributor_id, recipe.id));
                     }}
                   />
                 </button>

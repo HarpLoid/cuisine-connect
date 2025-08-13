@@ -8,3 +8,4 @@ create_db.sql
 create_db.sql
 migrations
 backend_virtual_env
+uploads

@@ -6,7 +6,12 @@ from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from dotenv import load_dotenv
+from werkzeug.utils import secure_filename
+from flask import current_app
 import os
+
+UPLOAD_FOLDER = 'app/static/uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -15,6 +20,7 @@ CORS(app, resources={r"/api/*": {"origins": "*"}})
 # load environment variables from the .env file
 load_dotenv()
 
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # secret_key
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'fallback-dev-key')
 app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'fallback-jwt-dev-key')
@@ -40,3 +46,4 @@ with app.app_context():
     from app.controllers import *
     
     db.create_all() # type: ignore
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)

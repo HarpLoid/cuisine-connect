@@ -56,24 +56,31 @@ export const getDetailRecipe = (id) => (dispatch, getState) => {
     });
 };
 
-export const createRecipe = (recipeData) => (dispatch, getState) => {
+export const createRecipe = (formData) => (dispatch, getState) => {
   dispatch({ type: RECIPE_LOADING });
 
-  const body = JSON.stringify(recipeData);
+  const config = {
+    ...tokenConfig(getState),
+    headers: {
+      ...tokenConfig(getState).headers,
+    },
+  };
 
-  axiosInstance
-    .post("/recipes/create", body, tokenConfig(getState))
+  return axiosInstance
+    .post("/recipes/create", formData, config)
     .then((res) => {
       dispatch({
         type: CREATE_RECIPE,
         payload: res.data,
       });
+      return res;
     })
     .catch((err) => {
       dispatch({
         type: GET_ERRORS,
         payload: err.response,
       });
+      throw err;
     });
 };
 
@@ -81,7 +88,7 @@ export const editRecipe = (id, formData) => (dispatch, getState) => {
   dispatch({ type: RECIPE_LOADING });
 
   axiosInstance
-    .patch(`/recipes/${id}`, formData, tokenConfig(getState))
+    .patch(`/recipes/${id}/edit`, formData, tokenConfig(getState))
     .then((res) => {
       dispatch({
         type: EDIT_RECIPE,
@@ -100,9 +107,8 @@ export const deleteRecipe = (id) => (dispatch, getState) => {
   dispatch({ type: RECIPE_LOADING });
 
   axiosInstance
-    .delete(`/recipes/${id}`, tokenConfig(getState))
+    .delete(`/recipes/${id}/delete`, tokenConfig(getState))
     .then((res) => {
-      console.log(res.data)
       dispatch({
         type: DELETE_RECIPE,
         payload: res.data,
@@ -139,9 +145,10 @@ export const saveRecipe = (user_id, id) => (dispatch, getState) => {
   dispatch({ type: RECIPE_LOADING });
 
   const body = JSON.stringify({ id });
+  console.log("Saving recipe with body:", body);
 
   axiosInstance
-    .post(`/user/profile/${user_id}/bookmarks/`, body, tokenConfig(getState))
+    .post(`/collections/${user_id}`, body, tokenConfig(getState))
     .then((res) => {
       dispatch({
         type: SAVE_RECIPE,

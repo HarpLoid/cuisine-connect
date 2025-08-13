@@ -50,22 +50,13 @@
             },
             "required": ["id", "recipe_id", "ingredient_id"]
         },
-        "Tag": {
+        "Category": {
             "type": "object",
             "properties": {
                 "id": { "type": "integer" },
                 "name": { "type": "string" }
             },
             "required": ["id", "name"]
-        },
-        "Recipe_Tag": {
-            "type": "object",
-            "properties": {
-                "id": { "type": "integer" },
-                "tag_id": { "type": "integer" },
-                "recipe_id": { "type": "integer" }
-            },
-            "required": ["id", "tag_id", "recipe_id"]
         },
         "Collection": {
             "type": "object",

@@ -4,11 +4,20 @@ import { useDispatch } from "react-redux";
 import { addPicture } from "../../../redux/actions/forms";
 
 export default function PictureUpload() {
-  const [picture, setPicture] = useState([]);
+  const [picture, setPicture] = useState(null);
+  const [preview, setPreview] = useState(null);
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(addPicture(picture));
+    if (picture) {
+      const objectUrl = URL.createObjectURL(picture);
+      setPreview(objectUrl);
+      // Clean up the object URL when component unmounts or picture changes
+      return () => URL.revokeObjectURL(objectUrl);
+    } else {
+      setPreview(null);
+    }
   }, [picture, dispatch]);
 
   return (
@@ -45,13 +54,25 @@ export default function PictureUpload() {
                 type="file"
                 className="sr-only"
                 onChange={(e) => {
-                  setPicture(e.target.files[0]);
+                  if (e.target.files && e.target.files[0]) {
+                    setPicture(e.target.files[0]);
+                  }
                 }}
               />
             </label>
             <p className="pl-1">or drag and drop</p>
           </div>
           <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+          {preview && (
+            <div className="mt-4">
+              <img
+                src={preview}
+                alt="Preview"
+                className="mx-auto max-h-48 rounded shadow"
+              />
+              <p className="text-xs text-gray-700 mt-2">{picture.name}</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

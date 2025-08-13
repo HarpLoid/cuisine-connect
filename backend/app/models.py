@@ -1,5 +1,4 @@
-from app import app, db
-
+from app import db
 
 class Ingredient(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -44,33 +43,24 @@ class User(db.Model):
         }
 
 
-Recipe_Tag = db.Table(
-    "recipe_tag",
-    db.Column("id", db.Integer, primary_key=True),
-    db.Column("tag_id", db.Integer, db.ForeignKey("tag.id"), nullable=False),
-    db.Column("recipe_id", db.Integer, db.ForeignKey("recipe.id"), nullable=False),
-)
-
-
 class Recipe(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False, unique=True)
-    header_image = db.Column(db.String(128), nullable=True)
-    prep_time = db.Column(db.Time, nullable=False)
+    header_image = db.Column(db.String(255), nullable=True)
+    prep_time = db.Column(db.String(128), nullable=False)
     description = db.Column(db.Text, nullable=False)
+    # category = db.Column(db.String(255), nullable=False)
     # difficulty = db.Column(db.Integer, nullable=False)
     # vegetarian = db.Column(db.Boolean, nullable=False)
     # quantity = db.Column(db.Float, nullable=False)
-    # unit = db.Column(db.String(64), nullable=False)
     contributor_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey("category.id"))
+    category = db.relationship("Category", backref="recipes")
     steps = db.relationship(
         "RecipeStep",
         backref=db.backref("recipe", uselist=False),
         cascade="all, delete",
         lazy=True,
-    )
-    tags = db.relationship(
-        "Tag", backref="recipes", secondary=Recipe_Tag, cascade="all, delete", lazy=True
     )
     ingredients = db.relationship(
         "RecipeIngredient",
@@ -97,32 +87,37 @@ class RecipeIngredient(db.Model):
     ingredient_id = db.Column(
         db.Integer, db.ForeignKey("ingredient.id"), nullable=False
     )
-    # quantity = db.Column(db.Float, nullable=False)
-    # unit = db.Column(db.String(64), nullable=False)
+    quantity = db.Column(db.Float, nullable=False)
+    unit = db.Column(db.String(64), nullable=False)
 
 
-class Tag(db.Model):
+class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+        }
 
-Collection_Recipe = db.Table(
-    "collection_recipe",
-    db.Column("id", db.Integer, primary_key=True),
-    db.Column(
-        "collection_id", db.Integer, db.ForeignKey("collection.id"), nullable=False
-    ),
-    db.Column("recipe_id", db.Integer, db.ForeignKey("recipe.id"), nullable=False),
-)
+
+# Collection_Recipe = db.Table(
+#     "collection_recipe",
+#     db.Column("id", db.Integer, primary_key=True),
+#     db.Column(
+#         "collection_id", db.Integer, db.ForeignKey("collection.id"), nullable=False
+#     ),
+#     db.Column("recipe_id", db.Integer, db.ForeignKey("recipe.id"), nullable=False),
+# )
 
 
 class Collection(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), nullable=False, unique=False)
+    # name = db.Column(db.String(64), nullable=False, unique=False)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    recipes = db.relationship(
-        "Recipe", secondary=Collection_Recipe, backref="collections", lazy=True
-    )
+    recipe_id = db.Column(db.Integer, db.ForeignKey("recipe.id"), nullable=True)
+    recipes = db.relationship("Recipe", backref="collections")
 
 
 class Comment(db.Model):
@@ -135,7 +130,6 @@ class Comment(db.Model):
         db.Integer, db.ForeignKey("comment.id"), nullable=True
     )
     date_time = db.Column(db.DateTime, nullable=False)
-    
 
     def to_dict(self):
         return {

@@ -1,24 +1,30 @@
-import React from "react";
+import React, { useEffect } from "react";
 import RecipeForm from "./recipe_form/RecipeForm";
 
 import { useParams } from "react-router-dom";
 
 import { useDispatch, useSelector } from "react-redux";
-import { editRecipe } from "../../redux/actions/recipes";
+import { editRecipe, getDetailRecipe } from "../../redux/actions/recipes";
 
 export default function RecipeEdit() {
   const dispatch = useDispatch();
   const { id } = useParams();
 
-  const { recipes, is_loading } = useSelector((state) => state.recipes);
+  useEffect(() => {
+    dispatch(getDetailRecipe(id));
+  }, [id, dispatch]);
 
-  console.log("Edit", recipes, "id", id)
+  const { detailRecipe, is_loading } = useSelector((state) => state.recipes);
 
-  const recipe = recipes.filter((recipe) => recipe.id === parseInt(id));
+  console.log("Edit", detailRecipe, "id", id)
 
   const handleFormSubmit = (formData) => {
     dispatch(editRecipe(id, formData));
   };
+
+  if (is_loading || !detailRecipe) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div>
@@ -26,7 +32,7 @@ export default function RecipeEdit() {
         buttonLabel="Update"
         handleFormSubmit={handleFormSubmit}
         editMode={true}
-        recipe={recipe}
+        recipe={detailRecipe}
       />
     </div>
   );
