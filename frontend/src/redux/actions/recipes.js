@@ -23,7 +23,6 @@ export const getRecipes = () => (dispatch) => {
   axiosInstance
     .get("/recipes/all", null, config)
     .then((res) => {
-      console.log("action",res.data)
       dispatch({
         type: GET_RECIPES,
         payload: res.data.recipes,
@@ -145,8 +144,6 @@ export const saveRecipe = (user_id, id) => (dispatch, getState) => {
   dispatch({ type: RECIPE_LOADING });
 
   const body = JSON.stringify({ id });
-  console.log("Saving recipe with body:", body);
-
   axiosInstance
     .post(`/collections/${user_id}`, body, tokenConfig(getState))
     .then((res) => {

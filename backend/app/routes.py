@@ -227,32 +227,28 @@ def user_collection(id):
         if recipe is None:
             abort(404)
         else:
-            for r in collection:
-                print("before append", r[1].id)
             if recipe.id in [r[1].id for r in collection]:
                 return jsonify(msg='Recipe already in collection'), 200
             else:
                 new_collection.recipe_id = recipe.id
-                for r in collection:
-                    print("after append", r)
                 db.session.add(new_collection)
                 db.session.commit()
                 return jsonify(msg='Recipe added to collection'), 201
-    if request.method == "DELETE":
-        if request.json:
-            recipe_id = request.json.get("recipe_id", None)
-        recipe = Recipe.query.get(recipe_id)
-        if recipe is None:
-            abort(404)
-        else:
-            if recipe.id not in [r.id for r in collection.recipes]:
-                return jsonify(msg='Recipe is not in collection'), 404
-            else:
-                db.session.query(Collection).filter_by(
-                    collection_id=collection.id
-                ).filter_by(recipe_id=recipe_id).delete()
-                db.session.commit()
-                return jsonify(msg='Recipe has been removed from collection'), 204
+    # if request.method == "DELETE":
+    #     if request.json:
+    #         recipe_id = request.json.get("recipe_id", None)
+    #     recipe = Recipe.query.get(recipe_id)
+    #     if recipe is None:
+    #         abort(404)
+    #     else:
+    #         if recipe.id not in [r[1] for r in collection]:
+    #             return jsonify(msg='Recipe is not in collection'), 404
+    #         else:
+    #             db.session.query(Collection).filter_by(
+    #                 collection_id=collection.id
+    #             ).filter_by(recipe_id=recipe_id).delete()
+    #             db.session.commit()
+    #             return jsonify(msg='Recipe has been removed from collection'), 204
 
 
 @app.route("/api/recipes/create", methods=["POST"])

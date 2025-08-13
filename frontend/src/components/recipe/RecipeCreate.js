@@ -10,7 +10,6 @@ export default function RecipeCreate() {
   const navigate = useNavigate();
 
   const handleFormSubmit = (formData) => {
-    console.log("RecipeCreate", createRecipe(formData));
     dispatch(createRecipe(formData)).then(() => {
       navigate("/dashboard");
     });

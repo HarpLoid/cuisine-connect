@@ -16,7 +16,6 @@ export default function Register() {
 
   const dispatch = useDispatch();
 
-  console.log(token)
 
   useEffect(() => {
     if (token) {

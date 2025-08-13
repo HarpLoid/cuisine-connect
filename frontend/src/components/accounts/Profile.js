@@ -12,7 +12,6 @@ export default function Profile() {
   const dispatch = useDispatch();
 
   const { user, avatar } = useSelector((state) => state.user);
-  console.log(user)
   const [username, setUsername] = useState(user.username);
   const [email, setEmail] = useState(user.email);
 

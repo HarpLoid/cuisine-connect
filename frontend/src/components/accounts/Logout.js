@@ -13,7 +13,6 @@ export default function Logout({ modal, setModal }) {
   const dispatch = useDispatch();
   const navigate = useNavigate
 
-  console.log(token)
 
   useEffect(() => {
     if (!token) {

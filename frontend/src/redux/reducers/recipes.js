@@ -26,7 +26,6 @@ export default function (state = initialState, action) {
         is_loading: true,
       };
     case GET_RECIPES:
-      console.log(action.payload)
       return {
         ...state,
         is_loading: false,

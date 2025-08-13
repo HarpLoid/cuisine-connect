@@ -100,7 +100,6 @@ export const getUserRecipes = (username) => (dispatch, getState) => {
   axiosInstance
     .get(`/users/${username}/recipes`, tokenConfig(getState))
     .then((res) => {
-      console.log(res.data)
       dispatch({
         type: GET_USER_RECIPES,
         payload: res.data.recipes,

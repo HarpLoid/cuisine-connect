@@ -14,7 +14,6 @@ export default function RecipeCreate(props) {
   const { category, ingredients, procedures, cook_time, picture } = useSelector(
     (state) => state.forms
   );
-   console.log("Category:", category);
   const handleFormSubmit = (e) => {
   e.preventDefault();
 
