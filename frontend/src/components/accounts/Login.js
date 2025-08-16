@@ -13,7 +13,6 @@ export default function Login() {
 
   const dispatch = useDispatch();
 
-
   useEffect(() => {
     if (token) {
       navigate("/dashboard");

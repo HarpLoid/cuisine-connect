@@ -18,7 +18,7 @@ class User(db.Model):
     name = db.Column(db.String(128), nullable=False, unique=False)
     username = db.Column(db.String(64), nullable=False, unique=True)
     email = db.Column(db.String(128), nullable=False, unique=True)
-    password = db.Column(db.String(64), nullable=False, unique=False)
+    password = db.Column(db.String(128), nullable=False, unique=False)
     bio = db.Column(db.Text, nullable=True, unique=False)
     recipes = db.relationship(
         "Recipe",

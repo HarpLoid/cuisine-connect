@@ -30,7 +30,6 @@ from app.models import User, Recipe, Ingredient, Category, Collection, Comment
 
 @app.route("/api/users", methods=["GET"])
 def users():
-    
     return jsonify([user.to_dict() for user in User.query.all()])
 
 @app.route("/api/users/register", methods=["POST"])
@@ -303,7 +302,7 @@ def recipes_n_path_edit(num):
                 "recipe_steps": json.loads(request.form.get("recipe_steps", "[]")),
                 "header_image": request.files.get("header_image"),
             }
-        edit_recipe(newRecipeFull, recipe, user)
+            edit_recipe(newRecipeFull, recipe, user)
         return Response(status=200)
 
 @app.route("/api/recipes/<int:num>/delete", methods=["DELETE"])

@@ -21,15 +21,16 @@ export default function Header() {
 
   const [modal, setModal] = useState(false);
 
+  console.log("Token:", token, "User:", user);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (token) {
+    if (token && !user) {
       dispatch(loadUser());
       dispatch(getAvatar());
     }
-  }, [token, dispatch]);
-
+  }, [token, user, dispatch]);
   return (
     <>
       {/* When the mobile menu is open, add `overflow-hidden` to the `body` element to prevent double scrollbars */}

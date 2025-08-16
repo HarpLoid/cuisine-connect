@@ -119,20 +119,16 @@ def edit_recipe(new_recipe_full, recipe: Recipe, user: User):
         add_recipe_steps(new_recipe_full, recipe.id)
 
     for attrib, val in new_recipe_full.items():
-        if val:
+        if val and attrib not in ['header_image']:
             setattr(recipe, attrib, new_recipe_full[attrib])
     db.session.add(recipe)
     db.session.commit()
 
 
 def add_new_user(new_user: dict):
-    new_user["password"] = bcrypt.generate_password_hash(
-        new_user["password"].encode("utf-8")
-    )
+    new_user["password"] = bcrypt.generate_password_hash(new_user["password"]).decode("utf-8")
     user = User(**new_user)
     db.session.add(user)
-    db.session.commit()
-    db.session.add(Collection(**{"name": "favorites", "user_id": user.id}))
     db.session.commit()
     
     return user.to_dict()

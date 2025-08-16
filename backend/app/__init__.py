@@ -27,8 +27,8 @@ app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'fallback-jwt-de
 app.config['JWT_TOKEN_LOCATION'] = ['cookies', 'headers']
 app.config['JWT_HEADER_NAME'] = 'Authorization'
 app.config['JWT_HEADER_TYPE'] = 'Bearer'
-app.config['JWT_COOKIE_SECURE'] = False
-app.config['JWT_COOKIE_CSRF_PROTECT'] = False
+app.config['JWT_COOKIE_SECURE'] = True if os.environ.get('FLASK_ENV') == 'production' else False
+app.config['JWT_COOKIE_CSRF_PROTECT'] = True
 # db configurations
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DB_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -45,5 +45,5 @@ with app.app_context():
     from app.routes import *
     from app.controllers import *
     
-    db.create_all() # type: ignore
+    db.create_all()
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)

@@ -7,5 +7,7 @@ table.py
 create_db.sql
 create_db.sql
 migrations
+psql_migrations
 backend_virtual_env
 uploads
+get_file_content.bash

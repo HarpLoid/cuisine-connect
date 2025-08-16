@@ -86,19 +86,21 @@ export const createRecipe = (formData) => (dispatch, getState) => {
 export const editRecipe = (id, formData) => (dispatch, getState) => {
   dispatch({ type: RECIPE_LOADING });
 
-  axiosInstance
+  return axiosInstance
     .patch(`/recipes/${id}/edit`, formData, tokenConfig(getState))
     .then((res) => {
       dispatch({
         type: EDIT_RECIPE,
         payload: res.data,
       });
+      return res;
     })
     .catch((err) => {
       dispatch({
         type: GET_ERRORS,
         payload: err.response,
       });
+      throw err;
     });
 };
 
