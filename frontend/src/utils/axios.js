@@ -1,7 +1,7 @@
 import axios from "axios";
 
 //const baseURL = "https://recipe-backend-api.herokuapp.com/api";
-const baseURL = "http://127.0.0.1:5000/api";
+const baseURL = process.env.REACT_APP_API_URL;
 
 const axiosInstance = axios.create({
   baseURL: baseURL,
